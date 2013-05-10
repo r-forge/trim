@@ -1,0 +1,11 @@
+Package: trim
+Type: Package
+Title: Tree methods for classification of imbalanced data
+Version: 0.1-1
+Date: 2013-05-10
+Author: Emmanuel Rousseaux
+Maintainer: Emmanuel Rousseaux <emmanuel.rousseaux@unige.ch>
+Description: This package provides ad hoc tree methods for dealing with classification of imbalanced variables.
+License: GPL-3
+Depends: partykit
+collapse: qvar.breaks.R findsplit.R tree.learn.R
