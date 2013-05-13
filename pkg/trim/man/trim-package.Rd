@@ -39,5 +39,5 @@ Maintainer: Emmanuel Rousseaux <emmanuel.rousseaux@unige.ch>
 Tree for global optimization: \code{\link[evtree:evtree-package]{evtree}}.
 }
 \examples{
-~~ simple examples of the most important functions ~~
+
 }

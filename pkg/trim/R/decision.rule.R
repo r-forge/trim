@@ -1,0 +1,75 @@
+# notes:
+# - we assure here a decision for a node depends only on the values taken by individuals of the node on the target variables
+# - then, a decision rule has to have the following arguments :
+# -- y: the target variable, with length(y) == number of individuals in the node
+# -- weights: non-response weighting, with length(weights) == number of individuals in the node
+# - a decision rule return the name of the class which won
+
+decision.rule.majority <- function(
+  y,
+  weights = rep(1, length(y)),
+  quiet=T
+) {
+  stopifnot(length(y)==length(weights))
+  distri <- distribution(y, weights = weights)@vector
+  m <- max(distri)
+  m.which <- which(distri == m)
+  
+  decision <- names(distri)[m.which[1]]
+  
+  if(length(m.which) > 1 && !quiet) {    
+    message(paste("   [decision.rule.majority] There are more than one maximal value, the decision is given to the first match: '", decision, "', but '", paste(names(distri)[m.which[-1]], collapse = "', '"), " 'could also be choose instead.", sep = ''))
+  }
+  
+  return(decision)
+}
+
+# data(iris)
+# species <- iris$Species
+# decision.rule.majority(species)
+# decision.rule.majority(species, quiet=F)
+# decision.rule.majority(species, weights = c(rep(0,50), rep(1,100)), quiet=F)
+# decision.rule.majority(species, weights = c(rep(0,50), rep(1,50), rep(2,50)), quiet=F)
+
+decision.rule.minority <- function(
+  y,
+  weights = rep(1, length(y)),
+  quiet=T
+) {
+  stopifnot(length(y)==length(weights))
+  distri <- distribution(y, weights = weights)@vector
+  m <- min(distri)
+  m.which <- which(distri == m)
+  
+  decision <- names(distri)[m.which[1]]
+  
+  if(length(m.which) > 1 && !quiet) {    
+    message(paste("   [decision.rule.minority] There are more than one minimal value, the decision is given to the first match: '", decision, "', but '", paste(names(distri)[m.which[-1]], collapse = "', '"), " 'could also be choose instead.", sep = ''))
+  }
+  
+  return(decision)
+}
+
+#FIXME : here we return a class is 0 observation...
+# data(iris)
+# species <- iris$Species
+# decision.rule.minority(species)
+# decision.rule.minority(species, quiet=F)
+# decision.rule.minority(species, weights = c(rep(0,50), rep(1,100)), quiet=F)
+# decision.rule.minority(species, weights = c(rep(0,50), rep(1,50), rep(2,50)), quiet=F)
+
+decision.rule.married <- function(
+  y,
+  weights = rep(1, length(y)),
+  quiet=T
+) {
+  
+  decision <- 'married'
+  
+  stopifnot(length(y)==length(weights))
+  stopifnot(decision %in% unique(y))
+  
+  return(decision)
+}
+
+# decision.rule.married(gilbert.data$civil.status)

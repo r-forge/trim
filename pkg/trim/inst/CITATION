@@ -1,0 +1,25 @@
+citHeader("To cite Dataset in publications please use:")
+
+p1 <- person("Emmanuel", "Rousseaux", email = "emmanuel.rousseaux@unige.ch")
+p2 <- person("Gilbert", "Ritschard", email = "gilbert.ritschard@unige.ch")
+
+citEntry(
+  entry = "INPROCEEDINGS",
+  title  = "title, use brackets for R {R}",
+  author = personList(
+    as.person("Emmanuel Rousseaux"),
+    as.person("Gilbert Ritschard")
+  ),
+  booktitle = "booktitle",
+  year = "2013",
+  url = "url",
+  textVersion = paste(
+    "Emmanuel Rousseaux, Gilbert Ritschard.",
+    "title",
+    "conference",
+    "URL url."
+  ),
+  header = "For the trim package:\n"
+)
+
+citFooter("See",sQuote("citation()"),"for citing R itself.")
