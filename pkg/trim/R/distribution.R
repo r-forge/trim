@@ -2,7 +2,8 @@ setClass(
   'Distribution',
   representation(
     vector = 'numeric',
-    precision = 'numeric'
+    precision = 'numeric',
+    p.estimator = 'character'
   ),
   validity = function(object) {
     flag = TRUE
@@ -67,6 +68,7 @@ setMethod(
   signature = c('Distribution'), 
   definition = function (object) {
     message(paste("Valid Distribution object checked with precision", object@precision))
+    message(paste("Estimator of probability used:", object@p.estimator))
     print(object@vector)
   }
 )
@@ -78,19 +80,27 @@ setMethod(
   }
 )
 
-setGeneric("distribution", function(x, weights = rep(1, length(x)), precision = 0.001){ standardGeneric("distribution") })
+setGeneric("distribution", function(
+  x,
+  weights = rep(1, length(x)),
+  precision = 0.001,
+  p.estimator = NA
+){ standardGeneric("distribution") })
 
 setMethod(
   f = 'distribution',
   signature = c('numeric'), 
-  definition = function (x, weights, precision) {
+  definition = function (x, weights, precision, p.estimator) {
+    stopifnot(length(x) == length(weights))
+    
     if(is.null(names(x)))
       names(x) <- paste('class.', 1:length(x), sep = '')
     
     return(new(
       Class = 'Distribution',
       vector = x,
-      precision = precision
+      precision = precision,
+      p.estimator = 'none'
     ))
   }
 )
@@ -104,20 +114,30 @@ setMethod(
 setMethod(
   f = 'distribution',
   signature = c('character'), 
-  definition = function (x, weights, precision) {
+  definition = function (x, weights, precision, p.estimator) {
+    stopifnot(length(x) == length(weights))
     
-    count <- numeric()
-    nam <- unique(x)
-    for (i in nam) {
-      count <- c(count, sum(weights[x == i]))
+    p.estimator.name <- 'none'
+    
+    if(missing(p.estimator) || !is.function(p.estimator)) {
+      count <- numeric()
+      nam <- unique(x)
+      for (i in nam) {
+        count <- c(count, sum(weights[x == i]))
+      }
+      names(count) <- nam
+      count <- count/sum(weights)
+    } else {
+      stopifnot(inherits(p.estimator, 'function'))
+      p.estimator.name <- deparse(match.call()['p.estimator'])
+      count <- p.estimator(y = x, weights = weights)
     }
-    names(count) <- nam
-    count <- count/sum(weights)
     
     return(new(
       Class = 'Distribution',
       vector = count,
-      precision = precision
+      precision = precision,
+      p.estimator = p.estimator.name
     ))
   }
 )
@@ -126,16 +146,26 @@ setMethod(
 # species.char <- as.character(iris$Species)
 # distribution(species.char)
 # distribution(species.char, weights=c(rep(1,50), rep(0,100)))
+# distribution(
+#   species.char,
+#   weights=c(rep(1,50), rep(0,100)),
+#   p.estimator = p.estimator.laplace
+# )
 
 setMethod(
   f = 'distribution',
   signature = c('factor'), 
-  definition = function (x, weights, precision) {
+  definition = function (x, weights, precision, p.estimator) {
     
     x.char <- as.character(x)
     
     return(
-      getMethod('distribution', signature = 'character')(x.char, weights = weights, precision)    
+      getMethod('distribution', signature = 'character')(
+        x.char,
+        weights = weights,
+        precision,
+        p.estimator
+      )    
     )
   }
 )
@@ -143,6 +173,11 @@ setMethod(
 # data(iris)
 # distribution(iris$Species)
 # distribution(iris$Species, weights=c(rep(1,50), rep(0,100)))
+# distribution(
+#   iris$Species,
+#   weights=c(rep(1,50), rep(0,100)),
+#   p.estimator = p.estimator.laplace
+# )
 
 distribution.comparable <- function(x, y, quiet = T){
   stopifnot(inherits(x, 'Distribution'))

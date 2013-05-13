@@ -14,14 +14,14 @@ p.estimator.laplace(
 }
 \arguments{
   \item{y}{
-A \code{character} of a \code{factor}.
+a \code{character} or a \code{factor}.
 }
   \item{weights}{
-A \code{numeric} vector for weighting, for example non-response weights.
+a \code{numeric} vector for weighting, for example non-response weights.
 }
 }
 \value{
-A \code{numeric} vector corresponding to the estimated probabilities.
+a \code{numeric} vector corresponding to the estimated probabilities.
 }
 \references{
 FIXME
@@ -34,7 +34,10 @@ Emmanuel Rousseaux
 }
 \examples{
 data(iris)
-p.estimator.laplace(iris$Species)
+p.estimator.laplace(
+  y = iris$Species,
+  weights = c(rep(0,50),rep(1,100))
+)
 }
 \keyword{ estimator }
 \keyword{ Laplace }

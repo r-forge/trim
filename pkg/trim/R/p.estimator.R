@@ -4,6 +4,8 @@
 # -- y: the target variable, with length(y) == number of individuals in the node
 # -- weights: non-response weighting, with length(weights) == number of individuals in the node
 
+# to ensure compatibility with the 'distribution' methods, a estimator of probability has to support 'character' and 'factor' objects
+
 p.estimator.laplace <- function(y, weights = rep(1, length(y))) {
   stopifnot(length(y) == length(weights))
   
@@ -32,3 +34,4 @@ p.estimator.laplace <- function(y, weights = rep(1, length(y))) {
 
 # data(iris)
 # p.estimator.laplace(iris$Species)
+# p.estimator.laplace(iris$Species, weights = c(rep(0,50),rep(1,100)))

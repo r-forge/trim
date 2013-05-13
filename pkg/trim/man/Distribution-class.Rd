@@ -16,13 +16,14 @@ Objects can be created by calls to the \code{\link{distribution}} methods.
   \describe{
     \item{\code{vector}:}{Object of class \code{"numeric"}}
     \item{\code{precision}:}{Object of class \code{"numeric"}}
-  }
+  \item{\code{vector}:}{Object of class \code{"numeric"} ~~ }\item{\code{precision}:}{Object of class \code{"numeric"} ~~ }\item{\code{p.estimator}:}{Object of class \code{"character"} ~~ }}
 }
 \section{Methods}{
   \describe{
     \item{print}{\code{signature(x = "Distribution")}: print a \code{Distribution} object (S3 method) }
     \item{show}{\code{signature(object = "Distribution")}:  print a \code{Distribution} object (S4 method) }
-	 }
+	 
+    \item{entropy.marcellin}{\code{signature(y = "Distribution", weights = "ANY", h0 = "ANY")}: ... }}
 }
 
 \author{
