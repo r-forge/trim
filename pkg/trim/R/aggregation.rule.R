@@ -11,12 +11,19 @@
 aggregation.rule.maximum <- function(
   y,
   kidsids,
-  weights = rep(1, length(y)),
   parent.utility = NA,
   kids.utility
 ) {
+  if(inherits(y, 'factor'))
+    y <- as.character(y)
+  if(inherits(y, 'character'))
+    y <- wvc(y)
+  stopifnot(inherits(y, 'WeightedVariable.categorical'))
+  stopifnot(length(y) == length(kidsids))
+  
   kids <- unique(kidsids)
   stopifnot(length(kids) == length(kids.utility))
+  
   kids.names <- names(kids.utility)
   stopifnot(all(kidsids %in% kids.names))
   
@@ -40,12 +47,19 @@ aggregation.rule.maximum <- function(
 aggregation.rule.minimum <- function(
   y,
   kidsids,
-  weights = rep(1, length(y)),
   parent.utility = NA,
   kids.utility
 ) {
+  if(inherits(y, 'factor'))
+    y <- as.character(y)
+  if(inherits(y, 'character'))
+    y <- wvc(y)
+  stopifnot(inherits(y, 'WeightedVariable.categorical'))
+  stopifnot(length(y) == length(kidsids))
+  
   kids <- unique(kidsids)
   stopifnot(length(kids) == length(kids.utility))
+  
   kids.names <- names(kids.utility)
   stopifnot(all(kidsids %in% kids.names))
   
@@ -69,12 +83,21 @@ aggregation.rule.minimum <- function(
 aggregation.rule.weighted.mean <- function(
   y,
   kidsids,
-  weights = rep(1, length(y)),
   parent.utility = NA,
   kids.utility
 ) {
+  if(inherits(y, 'factor'))
+    y <- as.character(y)
+  if(inherits(y, 'character'))
+    y <- wvc(y)
+  stopifnot(inherits(y, 'WeightedVariable.categorical'))
+  stopifnot(length(y) == length(kidsids))
+  
   kids <- unique(kidsids)
   stopifnot(length(kids) == length(kids.utility))
+  
+  weights <- y@weights
+  
   kids.names <- names(kids.utility)
   stopifnot(all(kidsids %in% kids.names))
   
@@ -103,14 +126,12 @@ aggregation.rule.weighted.mean <- function(
 aggregation.rule.information.gain <- function(
   y,
   kidsids,
-  weights = rep(1, length(y)),
   parent.utility,
   kids.utility
 ) {
   out <- aggregation.rule.weighted.mean(
     y = y,
     kidsids = kidsids,
-    weights = weights,
     parent.utility = NA,
     kids.utility = kids.utility
   )

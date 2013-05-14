@@ -49,6 +49,9 @@ a <- wvc(
   weights = c(rep(1,50), rep(0,100))
 )
 a
+
+a[1:10]
+length(a)
 }
 
 \keyword{ categorical }

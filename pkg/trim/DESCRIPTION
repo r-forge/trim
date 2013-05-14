@@ -1,8 +1,8 @@
 Package: trim
 Type: Package
 Title: Tree methods for classification of imbalanced data
-Version: 0.1-3
-Date: 2013-05-13
+Version: 0.1-4
+Date: 2013-05-14
 Author: Emmanuel Rousseaux
 Maintainer: Emmanuel Rousseaux <emmanuel.rousseaux@unige.ch>
 Description: This package provides ad hoc tree methods for dealing with classification of imbalanced variables.

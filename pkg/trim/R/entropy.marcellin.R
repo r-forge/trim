@@ -1,6 +1,5 @@
 setGeneric("entropy.marcellin", function(
   y,
-  weights = rep(1, length(y)),
   h0, # h0 same type as y
   p.estimator = NA,
   quiet = T
@@ -9,8 +8,8 @@ setGeneric("entropy.marcellin", function(
 
 setMethod(
   f = 'entropy.marcellin',
-  signature = c('Distribution'), 
-  definition = function (y, weights, h0, p.estimator, quiet) {
+  signature = c('Distribution', 'Distribution'), 
+  definition = function (y, h0, p.estimator, quiet) {
     
     stopifnot(distribution.comparable(y, h0))
     h0 <- distribution.reorder(h0, y)
@@ -61,15 +60,14 @@ setMethod(
 
 setMethod(
   f = 'entropy.marcellin',
-  signature = c('numeric'), 
-  definition = function (y, weights, h0, p.estimator, quiet) {
+  signature = c('numeric', 'numeric'), 
+  definition = function (y, h0, p.estimator, quiet) {
 
     entropy <- getMethod(
       'entropy.marcellin',
-      signature = c('Distribution'))(
-        y = distribution(y, weights, p.estimator = p.estimator),
-        weights = weights,
-        h0 = distribution(h0, weights),
+      signature = c('Distribution', 'Distribution'))(
+        y = distribution(y, p.estimator = p.estimator),
+        h0 = distribution(h0, p.estimator = p.estimator),
         quiet = quiet
       )
 
@@ -89,15 +87,14 @@ setMethod(
 
 setMethod(
   f = 'entropy.marcellin',
-  signature = c('character'), 
-  definition = function (y, weights, h0, p.estimator, quiet) {
+  signature = c('character', 'character'), 
+  definition = function (y, h0, p.estimator, quiet) {
     
     entropy <- getMethod(
       'entropy.marcellin',
-      signature = c('Distribution'))(
-        y = distribution(y, weights, p.estimator = p.estimator),
-        weights = weights,
-        h0 = distribution(h0, weights, p.estimator = p.estimator),
+      signature = c('Distribution', 'Distribution'))(
+        y = distribution(y, p.estimator = p.estimator),
+        h0 = distribution(h0, p.estimator = p.estimator),
         quiet = quiet
       )
     
@@ -113,15 +110,14 @@ setMethod(
 
 setMethod(
   f = 'entropy.marcellin',
-  signature = c('factor'), 
-  definition = function (y, weights, h0, p.estimator, quiet) {
+  signature = c('factor', 'factor'), 
+  definition = function (y, h0, p.estimator, quiet) {
     
     entropy <- getMethod(
       'entropy.marcellin',
-      signature = c('Distribution'))(
-        y = distribution(y, weights, p.estimator = p.estimator),
-        weights = weights,
-        h0 = distribution(h0, weights, p.estimator = p.estimator),
+      signature = c('Distribution', 'Distribution'))(
+        y = distribution(y, p.estimator = p.estimator),
+        h0 = distribution(h0, p.estimator = p.estimator),
         quiet = quiet
       )
     
@@ -135,6 +131,29 @@ setMethod(
 #   h0 = iris$Species
 # )
 
+setMethod(
+  f = 'entropy.marcellin',
+  signature = c('WeightedVariable.categorical', 'WeightedVariable.categorical'), 
+  definition = function (y, h0, p.estimator, quiet) {
+    
+    entropy <- getMethod(
+      'entropy.marcellin',
+      signature = c('Distribution', 'Distribution'))(
+        y = distribution(y, p.estimator = p.estimator),
+        h0 = distribution(h0, p.estimator = p.estimator),
+        quiet = quiet
+      )
+    
+    return(entropy)
+  }
+)
+
+
+# data(iris)
+# entropy.marcellin(
+#   y = wvc(iris$Species),
+#   h0 = wvc(iris$Species)
+# )
 
 
 # ----------------------------------------------
@@ -142,22 +161,34 @@ setMethod(
 # ----------------------------------------------
 
 entropy.marcellin.gain <- function(
-  y, # character or factor
+  y,
   kidsids,
-  weights = rep(1, length(y)),
   decision.rule = decision.rule.majority,
-  h0 = y, # character or factor
+  h0,
   aggregation.rule = aggregation.rule.weighted.mean,
   p.estimator = NA,
   quiet = T,
   rquiet = T
 ){
-  stopifnot(length(y) == length(weights))
   stopifnot(is.na(p.estimator) || is.function(p.estimator))
+  
+  if(inherits(y, 'factor'))
+    y <- as.character(y)
+  if(inherits(y, 'character'))
+    y <- wvc(y)
+  stopifnot(inherits(y, 'WeightedVariable.categorical'))
+  stopifnot(length(y) == length(kidsids))
+  
+  if(inherits(h0, 'factor'))
+    h0 <- as.character(h0)
+  if(inherits(h0, 'character'))
+    h0 <- wvc(h0)
+  stopifnot(inherits(h0, 'WeightedVariable.categorical'))
+  stopifnot(length(y) == length(kidsids))
+  
   
   parent.utility <- entropy.marcellin(
     y = y,
-    weights = weights,
     h0 = h0,
     p.estimator = p.estimator,
     quiet = rquiet
@@ -175,8 +206,7 @@ entropy.marcellin.gain <- function(
       kids.values,
       entropy.marcellin(
         y = y[ids],
-        weights = weights[ids],
-        h0 = h0[ids],
+        h0 = h0,
         p.estimator = p.estimator,
         quiet = rquiet
       )
@@ -188,16 +218,15 @@ entropy.marcellin.gain <- function(
   out <- aggregation.rule(
     y = y,
     kidsids = kidsids,
-    weights = weights,
     parent.utility = parent.utility,
     kids.utility = kids.values
   )
   
   if(!quiet) {
-    message(paste('   Number of individuals:', sum(weights)))
-    message(paste('   Parent distribution: ', paste("(", paste(distribution(y)@vector, collapse = ', '), ")", sep = '')))
+    message(paste('   Number of individuals:', sum(y@weights)))
+    message(paste('   Parent distribution: ', floatprint(distribution(y)@vector), sep = ''))
     message(paste('   Parent utility:', parent.utility))
-    message(paste('   Kids utility:', paste("(", paste(kids.values, collapse = ', '), ")", sep = '')))
+    message(paste('   Kids utility:', floatprint(kids.values), sep = ''))
     message(paste('   Aggregation:', out))
     
   }
@@ -221,7 +250,9 @@ entropy.marcellin.gain <- function(
 
 # entropy.marcellin.gain(
 #   y = gilbert.data$civil.status,
+#   h0 = gilbert.data$civil.status,
 #   kidsids = c(rep(1, 141), rep(2, 132)),
+#   aggregation.rule = aggregation.rule.information.gain,
 #   quiet = F,
 #   rquiet = T
 # )

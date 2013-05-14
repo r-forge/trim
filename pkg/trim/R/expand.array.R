@@ -41,3 +41,9 @@ expand.array <- function(array) {
 # df <- gen.data.from.array(ar)
 # table(df$civil.status)
 # table(df$sex,df$working.sector)
+
+
+floatprint <- function(x) {
+  return(paste('(', paste(format(x, digits = 4), collapse = ', '), ')', sep = ''))
+}
+# floatprint(c(0.43956043956044, 0.43956043956044, 0.120879120879121))

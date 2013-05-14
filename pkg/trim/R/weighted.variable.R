@@ -115,3 +115,27 @@ wv.infos <- function(x) {
 # wv.weights(a)
 # wv.infos(a)
 
+setMethod(
+  f ="[",
+  signature ="WeightedVariable.categorical",
+  definition = function(x,i){
+    return(wvc(
+      x@variable[i],
+      x@weights[i],
+      x@infos
+    ))
+  }
+)
+# data(iris)
+# a <- wvc(iris$Species)
+# a[1:10]
+
+setMethod(
+  f ="length",
+  signature ="WeightedVariable.categorical",
+  definition = function(x){
+    return(length(x@variable))
+  }
+)
+# a <- wvc(iris$Species)
+# length(a)

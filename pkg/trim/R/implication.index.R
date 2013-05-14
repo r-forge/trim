@@ -1,18 +1,36 @@
 # compute the implication indice for a given node
-implication <- function(
-  y,
-  target = decision.rule.majority(y, weights),
-  h0,
-  weights = rep(1, length(y)),
-  quiet=T
+implication.index <- function(
+  y, # character, factor, wvc
+  target = decision.rule.majority(y, quiet = quiet),
+  h0 = y, # character, factor, wvc, distribution
+  quiet=T,
+  ...
 ) {
+
+  if(inherits(y, 'factor'))
+    y <- as.character(y)
+  if(inherits(y, 'character'))
+    y <- wvc(y)
+  stopifnot(inherits(y, 'WeightedVariable.categorical'))
+  
+  weights <- y@weights
+  
+  if(!inherits(h0, 'Distribution')) {
+    if(inherits(h0, 'factor'))
+      h0 <- as.character(h0)
+    if(inherits(h0, 'character'))
+      h0 <- wvc(h0)
+    
+    stopifnot(inherits(h0, 'WeightedVariable.categorical'))
+    h0 <- distribution(h0)
+  } 
   
   distri <- h0@vector
   
   nbar.expected.p <- sum(distri[names(distri) != target])
   nbar.expected.n <- nbar.expected.p * sum(weights)
   
-  nbar.observed.n <- sum(weights[y !=target])
+  nbar.observed.n <- sum(weights[y@variable !=target])
   
   out <- nbar.observed.n
   
@@ -23,7 +41,7 @@ implication <- function(
     message(paste('   target:', target))
     message(paste('   Counter-examples expected:', nbar.expected.n))
     message(paste('   Counter-examples observed:', nbar.observed.n))
-    message(paste('   Implication:', imp))
+    message(paste('   Implication index:', imp))
   }
   
   return(imp)
@@ -45,13 +63,13 @@ implication <- function(
 # distribution(gilbert.data[gilbert.data$sex == 'man','civil.status'])
 # distribution(gilbert.data[gilbert.data$sex == 'woman','civil.status'])
 # 
-# imp.m <- implication(
+# imp.m <- implication.index(
 #   y = gilbert.data[gilbert.data$sex == 'man','civil.status'],
 #   h0 = distribution(gilbert.data$civil.status),
 #   quiet = F
 # )
-# 
-# imp.w <- implication(
+
+# imp.w <- implication.index(
 #   y = gilbert.data[gilbert.data$sex == 'woman','civil.status'],
 #   target =  decision.rule.majority(gilbert.data[gilbert.data$sex == 'woman','civil.status']),
 #   h0 = distribution(gilbert.data$civil.status),
@@ -65,21 +83,38 @@ implication <- function(
 
 
 # split evaluator
-implication.gain <- function(
-  y,
+implication.index.gain <- function(
+  y, # character, factor, wvc
   kidsids,
-  weights = rep(1, length(y)),
   decision.rule = decision.rule.majority,
-  h0 = distribution(y),
+  h0 = y, # character, factor, wvc, distribution
   aggregation.rule = aggregation.rule.weighted.mean,
   quiet = T,
   rquiet = T
 ){
-  stopifnot(length(y) == length(weights))
+  if(inherits(y, 'factor'))
+    y <- as.character(y)
+  if(inherits(y, 'character'))
+    y <- wvc(y)
+  stopifnot(inherits(y, 'WeightedVariable.categorical'))
   
-  parent.utility <- implication(
+  weights <- y@weights
+  
+  if(!inherits(h0, 'Distribution')) {
+    if(inherits(h0, 'factor'))
+      h0 <- as.character(h0)
+    if(inherits(h0, 'character'))
+      h0 <- wvc(h0)
+    
+    stopifnot(inherits(h0, 'WeightedVariable.categorical'))
+    h0 <- distribution(h0)
+  } 
+  
+  stopifnot(length(y) == length(kidsids))
+  
+  parent.utility <- implication.index(
     y = y,
-    target = decision.rule(y = y, weights = weights),
+    target = decision.rule(y),
     h0 = h0,
     weights = weights,
     quiet = rquiet
@@ -94,9 +129,9 @@ implication.gain <- function(
     
     kids.values <- c(
       kids.values,
-      implication(
+      implication.index(
         y = y[ids],
-        target = decision.rule(y = y[ids], weights[ids]),
+        target = decision.rule(y = y[ids]),
         h0 = h0,
         weights = weights,
         quiet = rquiet
@@ -109,7 +144,6 @@ implication.gain <- function(
   out <- aggregation.rule(
     y = y,
     kidsids = kidsids,
-    weights = weights,
     parent.utility = parent.utility,
     kids.utility = kids.values
   )
@@ -130,21 +164,27 @@ implication.gain <- function(
 # gilbert.data
 # names(gilbert.data)
 # 
-# implication.gain(
+# implication.index.gain(
+#   y = gilbert.data$civil.status,
+#   kidsids = c(rep(1, 141), rep(2, 132)),
+#   h0 = gilbert.data$civil.status
+# )
+# implication.index.gain(
 #   y = gilbert.data$civil.status,
 #   kidsids = c(rep(1, 141), rep(2, 132))
 # )
-# implication.gain(
+# 
+# implication.index.gain(
 #   y = gilbert.data$civil.status,
 #   kidsids = c(rep(1, 141), rep(2, 132)),
 #   aggregation.rule = aggregation.rule.maximum
 # )
-# implication.gain(
+# implication.index.gain(
 #   y = gilbert.data$civil.status,
 #   kidsids = c(rep(1, 141), rep(2, 132)),
 #   aggregation.rule = aggregation.rule.minimum
 # )
-# implication.gain(
+# implication.index.gain(
 #   y = gilbert.data$civil.status,
 #   kidsids = c(rep(1, 141), rep(2, 132))
 # )
@@ -152,23 +192,23 @@ implication.gain <- function(
 # kidsids.sector[gilbert.data$working.sector == 'primary'] <- 1
 # kidsids.sector[gilbert.data$working.sector == 'secondary'] <- 2
 # kidsids.sector[gilbert.data$working.sector == 'tertiary'] <- 3
-# implication.gain(
+# implication.index.gain(
 #   y = gilbert.data$civil.status,
 #   kidsids = kidsids.sector,
 #   h0 = distribution(gilbert.data$civil.status)
 # )
-# implication.gain(
+# implication.index.gain(
 #   y = gilbert.data$civil.status,
 #   kidsids = c(rep(1, 141), rep(2, 132)),
 #   h0 = distribution(gilbert.data$civil.status),
 #   decision.rule = decision.rule.married
 # )
-# implication(
+# implication.index(
 #   y = gilbert.data$civil.status,
 #   h0 = distribution(gilbert.data$civil.status),
 #   quiet = F
 # )
-# implication.gain(
+# implication.index.gain(
 #   y = gilbert.data$civil.status,
 #   kidsids = c(rep(1, 141), rep(2, 132)),
 #   h0 = distribution(gilbert.data$civil.status),
