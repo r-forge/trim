@@ -5,22 +5,14 @@
 Create a \code{Distribution} object.
 }
 \description{
-The \code{distribution} function is a generic method for creating a \code{Distribution} object.
+The \code{distribution} function is a generic S4 method for creating a \code{Distribution} object.
 }
 \usage{
-distribution(
-  x,
-  weights = rep(1, length(x)),
-  precision = 0.001, 
-  p.estimator = NA
-)
+distribution(x, precision = .Machine$double.eps, p.estimator = NA)
 }
 \arguments{
   \item{x}{
 A R object, see \code{\link{distribution-methods}}.
-}
-  \item{weights}{
-A \code{numeric} vector for weighting, for example non-response weights.
 }
   \item{precision}{
 A single numeric value. To be valid a \code{Distribution} object has to satisfy sum(object) == 1 +- precision.
@@ -37,7 +29,7 @@ Emmanuel Rousseaux
 }
 
 \seealso{
-\code{\link{Distribution-class}}, \code{\link{distribution.comparable}}, \code{\link{distribution.reorder}}.
+\code{\link[=Distribution-class]{Distribution}}, \code{\link{distribution.comparable}}, \code{\link{distribution.reorder}}.
 }
 \examples{
 distribution(c(0.2,0.8))
@@ -45,13 +37,11 @@ data(iris)
 distribution(iris$Species)
 
 distribution(
-  iris$Species,
-  weights=c(rep(1,50), rep(0,100)),
+  wvc(iris$Species, weights=c(rep(1,50), rep(0,100))),
   p.estimator = NA
 )
 distribution(
-  iris$Species,
-  weights=c(rep(1,50), rep(0,100)),
+  wvc(iris$Species, weights=c(rep(1,50), rep(0,100))),
   p.estimator = p.estimator.laplace
 )
 }

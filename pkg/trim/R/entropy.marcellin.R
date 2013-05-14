@@ -1,7 +1,7 @@
 setGeneric("entropy.marcellin", function(
   y,
   weights = rep(1, length(y)),
-  h0,
+  h0, # h0 same type as y
   p.estimator = NA,
   quiet = T
 ){ standardGeneric("entropy.marcellin") })

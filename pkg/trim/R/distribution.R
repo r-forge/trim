@@ -67,7 +67,7 @@ setMethod(
   f = 'show',
   signature = c('Distribution'), 
   definition = function (object) {
-    message(paste("Valid Distribution object checked with precision", object@precision))
+    message(paste("Valid Distribution object checked with precision", format(object@precision, digits = 3)))
     message(paste("Estimator of probability used:", object@p.estimator))
     print(object@vector)
   }
@@ -82,16 +82,14 @@ setMethod(
 
 setGeneric("distribution", function(
   x,
-  weights = rep(1, length(x)),
-  precision = 0.001,
+  precision = .Machine$double.eps,
   p.estimator = NA
 ){ standardGeneric("distribution") })
 
 setMethod(
   f = 'distribution',
   signature = c('numeric'), 
-  definition = function (x, weights, precision, p.estimator) {
-    stopifnot(length(x) == length(weights))
+  definition = function (x, precision, p.estimator) {
     
     if(is.null(names(x)))
       names(x) <- paste('class.', 1:length(x), sep = '')
@@ -113,11 +111,13 @@ setMethod(
 
 setMethod(
   f = 'distribution',
-  signature = c('character'), 
-  definition = function (x, weights, precision, p.estimator) {
-    stopifnot(length(x) == length(weights))
+  signature = c('WeightedVariable.categorical'), 
+  definition = function (x, precision, p.estimator) {
     
     p.estimator.name <- 'none'
+    
+    weights <- x@weights
+    x <- x@variable    
     
     if(missing(p.estimator) || !is.function(p.estimator)) {
       count <- numeric()
@@ -143,26 +143,40 @@ setMethod(
 )
 
 # data(iris)
+# distribution(wvc(iris$Species))
+
+setMethod(
+  f = 'distribution',
+  signature = c('character'), 
+  definition = function (x, precision, p.estimator) {
+    
+    return(
+      getMethod('distribution', signature = 'WeightedVariable.categorical')(
+        wvc(x),
+        precision,
+        p.estimator
+      )    
+    )
+  }
+)
+
+# data(iris)
 # species.char <- as.character(iris$Species)
 # distribution(species.char)
-# distribution(species.char, weights=c(rep(1,50), rep(0,100)))
+# distribution(wvc(species.char, weights=c(rep(1,50), rep(0,100))))
 # distribution(
-#   species.char,
-#   weights=c(rep(1,50), rep(0,100)),
+#   wvc(species.char,  weights=c(rep(1,50), rep(0,100))),
 #   p.estimator = p.estimator.laplace
 # )
 
 setMethod(
   f = 'distribution',
   signature = c('factor'), 
-  definition = function (x, weights, precision, p.estimator) {
-    
-    x.char <- as.character(x)
+  definition = function (x, precision, p.estimator) {
     
     return(
-      getMethod('distribution', signature = 'character')(
-        x.char,
-        weights = weights,
+      getMethod('distribution', signature = 'WeightedVariable.categorical')(
+        wvc(x),
         precision,
         p.estimator
       )    
@@ -172,10 +186,9 @@ setMethod(
 
 # data(iris)
 # distribution(iris$Species)
-# distribution(iris$Species, weights=c(rep(1,50), rep(0,100)))
+# distribution(wvc(iris$Species, weights=c(rep(1,50), rep(0,100))))
 # distribution(
-#   iris$Species,
-#   weights=c(rep(1,50), rep(0,100)),
+#   wvc(iris$Species, weights=c(rep(1,50), rep(0,100))),
 #   p.estimator = p.estimator.laplace
 # )
 

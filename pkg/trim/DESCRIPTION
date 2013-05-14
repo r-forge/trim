@@ -10,4 +10,4 @@ License: GPL-3
 Depends: methods, partykit
 Suggests: knitr
 VignetteBuilder: knitr
-collapse: expand.array.R p.estimator.R distribution.R decision.rule.R aggregation.rule.R implication.index.R entropy.shannon.R entropy.marcellin.R qvar.breaks.R findsplit.R tree.learn.R
+collapse: expand.array.R p.estimator.R weighted.variable.R distribution.R decision.rule.R aggregation.rule.R implication.index.R entropy.shannon.R entropy.marcellin.R qvar.breaks.R findsplit.R tree.learn.R

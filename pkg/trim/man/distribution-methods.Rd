@@ -4,6 +4,7 @@
 \alias{distribution,character-method}
 \alias{distribution,factor-method}
 \alias{distribution,numeric-method}
+\alias{distribution,WeightedVariable.categorical-method}
 \title{Standard builders for \code{Distribution} objects}
 \description{
 The \code{distribution} method is a generic method for creating \code{Distribution} objects.
@@ -22,6 +23,9 @@ Create a \code{Distribution} object from a \code{factor}. The distribution is co
 \item{\code{signature(x = "numeric")}}{
 Create a \code{Distribution} object from a \code{numeric} object.
 }
-}}
+\item{\code{signature(x = "WeightedVariable.categorical")}}{{
+Create a \code{Distribution} object from a \code{numeric} object.
+}
+}}}
 \keyword{methods}
 \keyword{distribution}
