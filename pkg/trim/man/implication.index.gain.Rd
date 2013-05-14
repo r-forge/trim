@@ -59,7 +59,7 @@ Emmanuel Rousseaux
 \code{\link{implication.index}}
 }
 \examples{
-gilbert.array <- array(
+ritschard.array <- array(
   data = c(50,5,5,40,5,8,6,12,10,0,50,6,14,30,2,10,18,2),
   dim = c(3,3,2),
   dimnames = list(
@@ -68,58 +68,58 @@ gilbert.array <- array(
     'sex' = c('man', 'woman')
   )
 )
-gilbert.data <- expand.array(gilbert.array)
-gilbert.data
-names(gilbert.data)
+ritschard.data <- expand.array(ritschard.array)
+ritschard.data
+names(ritschard.data)
 
 implication.index.gain(
-  y = gilbert.data$civil.status,
+  y = ritschard.data$civil.status,
   kidsids = c(rep(1, 141), rep(2, 132)),
-  h0 = gilbert.data$civil.status
+  h0 = ritschard.data$civil.status
 )
 implication.index.gain(
-  y = gilbert.data$civil.status,
+  y = ritschard.data$civil.status,
   kidsids = c(rep(1, 141), rep(2, 132))
 )
 
 implication.index.gain(
-  y = gilbert.data$civil.status,
+  y = ritschard.data$civil.status,
   kidsids = c(rep(1, 141), rep(2, 132)),
   aggregation.rule = aggregation.rule.maximum
 )
 implication.index.gain(
-  y = gilbert.data$civil.status,
+  y = ritschard.data$civil.status,
   kidsids = c(rep(1, 141), rep(2, 132)),
   aggregation.rule = aggregation.rule.minimum
 )
 implication.index.gain(
-  y = gilbert.data$civil.status,
+  y = ritschard.data$civil.status,
   kidsids = c(rep(1, 141), rep(2, 132))
 )
-kidsids.sector <- rep(0, nrow(gilbert.data))
-kidsids.sector[gilbert.data$working.sector == 'primary'] <- 1
-kidsids.sector[gilbert.data$working.sector == 'secondary'] <- 2
-kidsids.sector[gilbert.data$working.sector == 'tertiary'] <- 3
+kidsids.sector <- rep(0, nrow(ritschard.data))
+kidsids.sector[ritschard.data$working.sector == 'primary'] <- 1
+kidsids.sector[ritschard.data$working.sector == 'secondary'] <- 2
+kidsids.sector[ritschard.data$working.sector == 'tertiary'] <- 3
 implication.index.gain(
-  y = gilbert.data$civil.status,
+  y = ritschard.data$civil.status,
   kidsids = kidsids.sector,
-  h0 = distribution(gilbert.data$civil.status)
+  h0 = distribution(ritschard.data$civil.status)
 )
 implication.index.gain(
-  y = gilbert.data$civil.status,
+  y = ritschard.data$civil.status,
   kidsids = c(rep(1, 141), rep(2, 132)),
-  h0 = distribution(gilbert.data$civil.status),
+  h0 = distribution(ritschard.data$civil.status),
   decision.rule = decision.rule.married
 )
 implication.index(
-  y = gilbert.data$civil.status,
-  h0 = distribution(gilbert.data$civil.status),
+  y = ritschard.data$civil.status,
+  h0 = distribution(ritschard.data$civil.status),
   quiet = FALSE
 )
 implication.index.gain(
-  y = gilbert.data$civil.status,
+  y = ritschard.data$civil.status,
   kidsids = c(rep(1, 141), rep(2, 132)),
-  h0 = distribution(gilbert.data$civil.status),
+  h0 = distribution(ritschard.data$civil.status),
   aggregation.rule = aggregation.rule.information.gain
 )
 }
