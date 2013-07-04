@@ -1,0 +1,36 @@
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{An overview of the trim package}
+\documentclass{article}
+\title{An overview of the trim package}
+\author{Emmanuel Rousseaux and Gilbert Ritschard}
+\date{\today}
+
+\begin{document}
+
+
+\section{Introduction}
+
+
+\section{Building a new tree method with trim components}
+
+\subsection{Computing distributions}
+
+<<>>=
+library(trim)
+data(iris)
+@
+
+<<tidy=FALSE>>=
+distribution(
+  wvc(iris$Species, weights=c(rep(1,50), rep(0,100))),
+  p.estimator = NA
+)
+@
+
+<<tidy=FALSE>>=
+distribution(
+  wvc(iris$Species, weights=c(rep(1,50), rep(0,100))),
+  p.estimator = p.estimator.laplace
+)
+@
+\end{document}

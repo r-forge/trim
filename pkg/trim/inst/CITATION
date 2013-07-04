@@ -1,4 +1,4 @@
-citHeader("To cite Dataset in publications please use:")
+citHeader("To cite trim in publications please use:")
 
 p1 <- person("Emmanuel", "Rousseaux", email = "emmanuel.rousseaux@unige.ch")
 p2 <- person("Gilbert", "Ritschard", email = "gilbert.ritschard@unige.ch")
